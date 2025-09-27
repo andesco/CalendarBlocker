@@ -65,7 +65,7 @@ wrangler login
 wrangler deploy
 ```
 
-## Usage &
+## Usage
 
 Add or subscribe to a calendar using your worker subdomain, a custom subdomain, or blocker.day:
  
@@ -79,22 +79,19 @@ Calendar feeds generate consistent blocks of time based on the seed being used. 
 
 - change the default value of `SEED`; or
 - set `SEED_VIA_URL` to `true` and set an optional per-calendar `SEED` in the URL query: `https://subdomain.personal.com/calendar?seed=random-seed-value`
-
- 
- ##
  
  ### Environment Variables
  
  | Variable      | Description                            | Default                  |
  |---------------|----------------------------------------|--------------------------|
  | `DAYS`        | number of days: 1–21                   | `14`                     |
- | `HOURS`       | hours in each block of time: <br /> 0.5, 1, 2, 3, 4, 6, 8, 12, 24 | `3`  |
- | `TIMEZONE`    | [IANA timezone identifier][wiki]       | [`America/Toronto`][timeis]     |
+ | `HOURS`       | hours in each block of time: <br /> 0.5, 1, 2, 3, 4, 6, 8, 12, 24 | `3` |
+ | `TIMEZONE`    | [IANA timezone identifier][wiki]       | [`America/Toronto`][timeis]    |
  | `NAME`        | calendar/event name displayed in apps  | `Blocker.day`            |
  | `PROBABILITY` | probability of a time block: 0.00–1.00 | `0.50`                   |
- | `REDIRECT`    | redirects hostname root                | [`andesco/blocker.day`][github] |
+ | `REDIRECT`    | redirects hostname root           | [`andesco/blocker.day`][repo] |
  | `SEED`        | default seed value                     | `default-seed-value`     |
- | `SEED_VIA_URL`| enable seeting `SEED` via URL query: <br /> true, false | `false` |
+ | `SEED_VIA_URL`| enable setting `SEED` via URL query: <br /> true, false | `false` |
  
 ### URL Query Parameters
 
@@ -109,5 +106,5 @@ Calendar feeds generate consistent blocks of time based on the seed being used. 
    [iana]:  https://www.iana.org/time-zones
    [wiki]:  https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
    [timeis]: https://time.is/Toronto
-   [github]: https://github.com/andesco/blocker.day
+   [repo]: https://github.com/andesco/blocker.day
   
