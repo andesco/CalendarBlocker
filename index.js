@@ -58,7 +58,7 @@ export default {
       if (!isNaN(qProb)) blockProbability = clamp(qProb, 0.00, 1.00);
     }
     const calendarName = env.NAME || "CalendarBlocker";
-    const uidHost = url.hostname || "blocker.andrewe.dev";
+    const uidHost = url.hostname || "blocker.andrewe.ca";
 
     const calendar = generateICS({
       seedSalt: seed,
@@ -88,7 +88,7 @@ function generateICS({ seedSalt, blockProbability, calendarName, uidHost, timezo
   // Create a base domain for UIDs from the seed
   // This ensures UIDs are stable but unique per calendar
   const seedHash = hashString(seedSalt).toString(16);
-  const uidDomain = `${seedHash}@${uidHost || "blocker.andrewe.dev"}`;
+  const uidDomain = `${seedHash}@${uidHost || "blocker.andrewe.ca"}`;
   
   const events = [];
 

@@ -5,7 +5,7 @@ CalendarBlocker helps you block time randomly and quickly, with a .ics calendar 
 Using random (but deterministic) blocks of unavailable time, you can quickly populate an otherwise sparse calendar app, including Apple or Google; or randomly limit availability in a scheduling app, including [Cal.com](https://cal.com) and [SavvyCal](https://savvycal.com).
 
 For example, CalendarBlocker in Apple Calendar, set to 1 hour blocks and 50% probability: \
-[blocker.andrewe.dev/calendar.ics?h=1&p=0.50](https://blocker.andrewe.dev/calendar.ics?h=1&p=0.50)
+[blocker.andrewe.ca/calendar.ics?h=1&p=0.50](https://blocker.andrewe.ca/calendar.ics?h=1&p=0.50)
 
 <picture style="max-width: 554px; width: 100%; display: block;">
   <source srcset="Calendar-app-dark.png" media="(prefers-color-scheme: dark)">
@@ -19,14 +19,14 @@ For example, CalendarBlocker in Apple Calendar, set to 1 hour blocks and 50% pro
 - deterministic pseudo-random availability based on your seed value, probability, and time block
 - time blocks begin each day at midnight (00:00) in the timezone specified
 
-## Add or Subscribe: [blocker.andrewe.dev/calendar](https://blocker.andrewe.dev/calendar.ics)
+## Add or Subscribe: [blocker.andrewe.ca/calendar](https://blocker.andrewe.ca/calendar.ics)
 
 Add or subscribe to CalendarBlocker in your calendar or scheduling app. You can include the optional `.ics` file extension and set `DAYS`, `HOURS`, and `PROBABILITY` in the URL query:
 
-https://blocker.andrewe.dev/calendar \
-https://blocker.andrewe.dev/calendar.ics \
-https://blocker.andrewe.dev/calendar.ics?d=7&h=4&p=0.35 \
-https://blocker.andrewe.dev/calendar.ics?days=7&hours=4&probability=0.35
+https://blocker.andrewe.ca/calendar \
+https://blocker.andrewe.ca/calendar.ics \
+https://blocker.andrewe.ca/calendar.ics?d=7&h=4&p=0.35 \
+https://blocker.andrewe.ca/calendar.ics?days=7&hours=4&probability=0.35
 
 
 ## Deploy to Cloudflare
@@ -84,13 +84,13 @@ npm run deploy:local
 
 ## Usage
 
-Add or subscribe to a calendar using your worker subdomain, a custom subdomain, or blocker.andrewe.dev:
+Add or subscribe to a calendar using your worker subdomain, a custom subdomain, or blocker.andrewe.ca:
  
 `https://blocker.username.workers.dev/calendar.ics`
 
 `https://subdomain.personal.com/calendar.ics`
 
-`https://blocker.andrewe.dev/calendar.ics`
+`https://blocker.andrewe.ca/calendar.ics`
 
 Calendar feeds generate consistent blocks of time based on the seed being used. To get a new set of randomized (but deterministic) blocks of time, update your Cloudflare Worker environment variables:
 
