@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "blocker",
+  "main": "index.js",
+  "compatibility_date": "2024-05-01",
+  "vars": {
+    "HOURS": "3",
+    "PROBABILITY": "0.50",
+    "NAME": "CalendarBlocker",
+    "SEED": "default-seed",
+    "SEED_VIA_URL": "false",
+    "TIMEZONE": "America/Toronto",
+    "DAYS": "21",
+    "REDIRECT": "https://github.com/andesco/CalendarBlocker"
+  }
+}

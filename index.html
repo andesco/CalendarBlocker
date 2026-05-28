@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blocker.day — calendar block generator</title>
+  <title>CalendarBlocker — calendar block generator</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
   <style>
@@ -21,62 +21,65 @@
   </style>
 </head>
 <body class="markdown-body">
-  <h1>Blocker.day</h1>
-<p>Blocker.day is a Cloudflare Worker that generates a <code>.ics</code> calendar feed with random (but deterministic) blocks of unavailable time.</p>
-<p>Blocker.day can quickly populate an otherwise empty or sparse calendar or scheduling app, including <a href="https://cal.com">Cal.com</a> and <a href="https://savvycal.com">SavvyCal</a>.</p>
+  <h1>CalendarBlocker</h1>
+<p>CalendarBlocker is a Cloudflare Worker that generates a <code>.ics</code> calendar feed with random (but deterministic) blocks of unavailable time.</p>
+<p>CalendarBlocker can quickly populate an otherwise empty or sparse calendar or scheduling app, including <a href="https://cal.com">Cal.com</a> and <a href="https://savvycal.com">SavvyCal</a>.</p>
 <h2>Features</h2>
 <ul>
-<li>generates a consistent <code>.ics</code> calendar file based on <code>seed_value</code></li>
+<li>generates a consistent <code>.ics</code> calendar file based on <code>SEED</code></li>
 <li>randomized but deterministic availability for each time block</li>
 <li>time blocks begin each day at midnight (00:00) in the timezone specified</li>
 </ul>
 <h2>Add or Subscribe</h2>
 <p>Add or subscribe in your calendar or scheduling app:</p>
-<h3><a href="http://blocker.day/random-seed-value">blocker.day/random-seed-value</a></h3>
-<h3><a href="http://blocker.day/random-seed-value.ics">blocker.day/random-seed-value.ics</a></h3>
-<p>In these examples, the seed is <code>random-seed-value</code> and default settings are used. To change these settings, deploy your own app to Cloudflare and set your <a href="#environment-variables">environment variables</a>.</p>
+<h3><a href="https://blocker.andrewe.dev/calendar">blocker.andrewe.dev/calendar</a></h3>
+<h3><a href="https://blocker.andrewe.dev/calendar.ics">blocker.andrewe.dev/calendar.ics</a></h3>
+<p>In these examples, the default seed and settings are used. To change these settings, deploy your own app to Cloudflare and set your <a href="#environment-variables">environment variables</a>.</p>
 <h2>Deploy</h2>
 <h3>Option 1: Deploy to Cloudflare</h3>
-<p><a href="https://deploy.workers.cloudflare.com/?url=https://github.com/andesco/blocker.day"><img src="https://deploy.workers.cloudflare.com/button" alt="Deploy to Cloudflare"></a></p>
+<p><a href="https://deploy.workers.cloudflare.com/?url=https://github.com/andesco/CalendarBlocker"><img src="https://deploy.workers.cloudflare.com/button" alt="Deploy to Cloudflare"></a></p>
 <h3>Option 2: Manual Deployment</h3>
 <ol>
 <li>Clone this repo:</li>
 </ol>
-<pre><code class="language-bash">git clone https://github.com/andesco/blocker.day.git
-cd blocker.day
+<pre><code class="language-bash">git clone https://github.com/andesco/CalendarBlocker.git
+cd CalendarBlocker
 </code></pre>
 <ol start="2">
-<li>Customize environment variables in <code>wrangler.toml</code> as needed. Example:</li>
+<li>Customize environment variables in <code>wrangler.jsonc</code> as needed. Example:</li>
 </ol>
-<pre><code class="language-toml">BLOCK_PROBABILITY = &quot;0.25&quot;
-TIMEZONE = &quot;America/Vancouver&quot;
-BLOCK_HOURS = &quot;4&quot;
-TOTAL_DAYS = &quot;21&quot;
+<pre><code class="language-json">{
+  &quot;vars&quot;: {
+    &quot;DAYS&quot;: &quot;21&quot;,
+    &quot;HOURS&quot;: &quot;4&quot;,
+    &quot;PROBABILITY&quot;: &quot;0.25&quot;,
+    &quot;TIMEZONE&quot;: &quot;America/Vancouver&quot;
+  }
+}
 </code></pre>
 <ol start="3">
-<li>Install Cloudflare’s Wrangler CLI, login, and deply:</li>
+<li>Install Cloudflare’s Wrangler CLI, login, and deploy:</li>
 </ol>
 <pre><code class="language-bash">npm install -g wrangler
 wrangler login
-wrangler deploy
+npm run deploy
 </code></pre>
 <h2>Usage</h2>
-<p>Add or subscribe to a calendar by adding <code>/{seed}</code> or <code>/{seed}.ics</code> to your worker subdomain, a custom domain, or blocker.day:</p>
+<p>Add or subscribe to a calendar using your worker subdomain, a custom domain, or blocker.andrewe.dev:</p>
 <p><strong>your worker</strong> <br/></p>
 <ul>
 <li><code>https://blocker.username.workers.dev/calendar</code><br /></li>
-<li><code>https://blocker.personal.com/calendar.ics</code><br /></li>
+<li><code>https://subdomain.personal.com/calendar.ics</code><br /></li>
 </ul>
-<p><strong>blocker.day</strong> <br/></p>
+<p><strong>blocker.andrewe.dev</strong> <br/></p>
 <ul>
-<li><code>https://blocker.day/random-seed-value</code> <br /></li>
-<li><code>https://blocker.day/random-seed-value.ics</code> <br/></li>
-<li><code>https://blocker.day/your-name.ics</code></li>
+<li><code>https://blocker.andrewe.dev/calendar</code> <br /></li>
+<li><code>https://blocker.andrewe.dev/calendar.ics</code> <br/></li>
 </ul>
 <p>The calendar feed displays consistent blocks of time based on the seed. To get a new set of randomized (but deterministic) blocks of time, change the seed:</p>
 <ol>
-<li>update the URL path or .ics filename; or</li>
-<li>set <code>SEED_VALUE_ONLY</code> to <code>true</code> and update <code>SEED_VALUE</code>.</li>
+<li>change the default value of <code>SEED</code>; or</li>
+<li>set <code>SEED_VIA_URL</code> to <code>true</code> and set <code>seed</code> in the URL query.</li>
 </ol>
 <h2>Environment Variables</h2>
 <table>
@@ -88,24 +91,24 @@ wrangler deploy
 </tr>
 </thead>
 <tbody><tr>
-<td><code>SEED_VALUE</code></td>
-<td>default seed:<br/>text</td>
+<td><code>SEED</code></td>
+<td>default seed value</td>
 <td><code>default-seed</code></td>
 </tr>
 <tr>
-<td><code>SEED_VALUE_ONLY</code></td>
-<td>always use <code>SEED_VALUE</code>:<br/>true, false</td>
+<td><code>SEED_VIA_URL</code></td>
+<td>enable setting <code>SEED</code> via URL query:<br/>true, false</td>
 <td><code>false</code></td>
 </tr>
 <tr>
-<td><code>BLOCK_PROBABILITY</code></td>
+<td><code>PROBABILITY</code></td>
 <td>probability of a time block:<br/>0.00–1.00</td>
 <td><code>0.50</code></td>
 </tr>
 <tr>
-<td><code>CALENDAR_NAME</code></td>
+<td><code>NAME</code></td>
 <td>calendar name displayed in apps:<br/>text</td>
-<td><code>Blocked</code></td>
+<td><code>CalendarBlocker</code></td>
 </tr>
 <tr>
 <td><code>TIMEZONE</code></td>
@@ -113,12 +116,12 @@ wrangler deploy
 <td><code>America/Toronto</code></td>
 </tr>
 <tr>
-<td><code>BLOCK_HOURS</code></td>
-<td>hours in each block of time:<br />1, 2, 3, 4, 6, 8, 12, 24</td>
+<td><code>HOURS</code></td>
+<td>hours in each block of time:<br />0.5, 1, 2, 3, 4, 6, 8, 12, 24</td>
 <td><code>3</code></td>
 </tr>
 <tr>
-<td><code>TOTAL_DAYS</code></td>
+<td><code>DAYS</code></td>
 <td>number of days:<br/>1–21</td>
 <td><code>14</code></td>
 </tr>

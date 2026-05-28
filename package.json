@@ -1,11 +1,13 @@
 {
-  "name": "blocker-day",
+  "name": "blocker",
   "version": "0.1.0",
-  "description": "Blocker.day is a Cloudflare Worker that generates a .ics calendar feed to create deterministic blocks of time",
+  "description": "CalendarBlocker generates deterministic .ics calendar feeds for quickly blocking unavailable time.",
   "main": "index.js",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "dev": "wrangler dev -c wrangler.jsonc",
+    "deploy": "wrangler deploy -c wrangler.jsonc",
+    "dev:local": "wrangler dev -c wrangler.local.jsonc",
+    "deploy:local": "wrangler deploy -c wrangler.local.jsonc"
   },
   "author": "",
   "license": "MIT",

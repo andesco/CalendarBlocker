@@ -1,16 +1,16 @@
-# Blocker.day
+# CalendarBlocker
 
-Blocker.day helps you block time randomly and quickly, with a .ics calendar feed set to your desired availability.
+CalendarBlocker helps you block time randomly and quickly, with a .ics calendar feed set to your desired availability.
 
 Using random (but deterministic) blocks of unavailable time, you can quickly populate an otherwise sparse calendar app, including Apple or Google; or randomly limit availability in a scheduling app, including [Cal.com](https://cal.com) and [SavvyCal](https://savvycal.com).
 
-For example, Blocker.day in Apple Calendar, set to 1 hour blocks and 50% probability: \
-[blocker.day/calendar.ics?h=1&p=0.50](https://blocker.day/calendar.ics?h=1&p=0.50)
+For example, CalendarBlocker in Apple Calendar, set to 1 hour blocks and 50% probability: \
+[blocker.andrewe.dev/calendar.ics?h=1&p=0.50](https://blocker.andrewe.dev/calendar.ics?h=1&p=0.50)
 
 <picture style="max-width: 554px; width: 100%; display: block;">
   <source srcset="Calendar-app-dark.png" media="(prefers-color-scheme: dark)">
   <source srcset="Calendar-app-light.png" media="(prefers-color-scheme: light)">
-  <img src="Calendar-app-light.png" alt="Blocker.day in Apple Calendar with 1 hour blocks and 50% probability"  style="width: 100%; height: auto; display: block;">
+  <img src="Calendar-app-light.png" alt="CalendarBlocker in Apple Calendar with 1 hour blocks and 50% probability"  style="width: 100%; height: auto; display: block;">
 </picture>
 
 ## Features
@@ -19,61 +19,78 @@ For example, Blocker.day in Apple Calendar, set to 1 hour blocks and 50% probabi
 - deterministic pseudo-random availability based on your seed value, probability, and time block
 - time blocks begin each day at midnight (00:00) in the timezone specified
 
-## Add or Subscribe: [blocker.day/calendar](https://blocker.day/calendar.ics)
+## Add or Subscribe: [blocker.andrewe.dev/calendar](https://blocker.andrewe.dev/calendar.ics)
 
-Add or subscribe to Blocker.day in your calendar or scheduling app. You can include the option `.ics` file extension and set `DAYS`, `HOURS`, and `PROBABILITY` in the URL query:
+Add or subscribe to CalendarBlocker in your calendar or scheduling app. You can include the optional `.ics` file extension and set `DAYS`, `HOURS`, and `PROBABILITY` in the URL query:
 
-https://blocker.day/calendar \
-https://blocker.day/calendar.ics \
-https://blocker.day/calendar.ics?d=7&h=4&p=0.35 \
-https://blocker.day/calendar.ics?days=7&hours=4&probability=0.35
+https://blocker.andrewe.dev/calendar \
+https://blocker.andrewe.dev/calendar.ics \
+https://blocker.andrewe.dev/calendar.ics?d=7&h=4&p=0.35 \
+https://blocker.andrewe.dev/calendar.ics?days=7&hours=4&probability=0.35
 
 
 ## Deploy to Cloudflare
 
-Blocker.day is a Cloudflare Worker (serverless function) that generates a unique `.ics` calendar feeds.
+CalendarBlocker is a Cloudflare Worker (serverless function) that generates unique `.ics` calendar feeds.
 
 Deploy your own Cloudflare Worker to change additional settings (using [environment variables](#variables)) including `NAME`, `SEED`, `SEED_VIA_URL`, and `TIMEZONE`,
 
 ### Option 1: Deploy to Cloudflare
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/andesco/blocker.day)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/andesco/CalendarBlocker)
 
 ### Option 2: Manual Deployment
 
 1. Clone this repo:
 
 ```bash
-git clone https://github.com/andesco/blocker.day.git
-cd blocker.day
+git clone https://github.com/andesco/CalendarBlocker.git
+cd CalendarBlocker
 ```
 
-2. Customize default variables in `wrangler.toml` as needed. Example:
+2. Customize default variables in `wrangler.jsonc` as needed. Example:
 
-```toml wrangler.toml
-DAYS = "21"
-HOURS = "4"
-PROBABILITY = "0.25"
-TIMEZONE = "America/Vancouver"
+```jsonc
+{
+  "vars": {
+    "DAYS": "21",
+    "HOURS": "4",
+    "PROBABILITY": "0.25",
+    "TIMEZONE": "America/Vancouver"
+  }
+}
 ```
 
-3. Install Cloudflare’s Wrangler CLI, login, and deploy:
+3.
+
+Install Wrangler CLI, login, and deploy:
+: Wrangler is the Cloudflare Developer Platform command-line interface (CLI)
+
+*[CLI]: Hyper Text Markup Language
 
 ```bash
 npm install -g wrangler
 wrangler login
-wrangler deploy
+npm run deploy
+```
+
+### Personal Deployment
+
+For a private deployment config, create `wrangler.local.jsonc` and deploy with:
+
+```bash
+npm run deploy:local
 ```
 
 ## Usage
 
-Add or subscribe to a calendar using your worker subdomain, a custom subdomain, or blocker.day:
+Add or subscribe to a calendar using your worker subdomain, a custom subdomain, or blocker.andrewe.dev:
  
-`https://appname.username.workers.dev/calendar.ics`
+`https://blocker.username.workers.dev/calendar.ics`
 
-`https://subdomain.personal.com/calenda.ics`
+`https://subdomain.personal.com/calendar.ics`
 
-`https://blocker.day/calendar.ics`
+`https://blocker.andrewe.dev/calendar.ics`
 
 Calendar feeds generate consistent blocks of time based on the seed being used. To get a new set of randomized (but deterministic) blocks of time, update your Cloudflare Worker environment variables:
 
@@ -87,9 +104,9 @@ Calendar feeds generate consistent blocks of time based on the seed being used. 
  | `DAYS`        | number of days: 1–21                   | `14`                     |
  | `HOURS`       | hours in each block of time: <br /> 0.5, 1, 2, 3, 4, 6, 8, 12, 24 | `3` |
  | `TIMEZONE`    | [IANA timezone identifier][wiki]       | [`America/Toronto`][timeis]    |
- | `NAME`        | calendar/event name displayed in apps  | `Blocker.day`            |
+ | `NAME`        | calendar/event name displayed in apps  | `CalendarBlocker`        |
  | `PROBABILITY` | probability of a time block: 0.00–1.00 | `0.50`                   |
- | `REDIRECT`    | redirects hostname root           | [`andesco/blocker.day`][repo] |
+ | `REDIRECT`    | redirects hostname root                | [`andesco/CalendarBlocker`][github] |
  | `SEED`        | default seed value                     | `default-seed-value`     |
  | `SEED_VIA_URL`| enable setting `SEED` via URL query: <br /> true, false | `false` |
  
@@ -106,5 +123,5 @@ Calendar feeds generate consistent blocks of time based on the seed being used. 
    [iana]:  https://www.iana.org/time-zones
    [wiki]:  https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
    [timeis]: https://time.is/Toronto
-   [repo]: https://github.com/andesco/blocker.day
+   [github]: https://github.com/andesco/CalendarBlocker
   

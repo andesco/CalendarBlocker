@@ -8,7 +8,7 @@ export default {
 
     // Redirect root requests to repository URL (env.REDIRECT)
     if (pathname === '/' || pathname === '/index.html') {
-      const redirectUrl = env.REDIRECT || 'http://github.com/andesco/blocker.day';
+      const redirectUrl = env.REDIRECT || 'https://github.com/andesco/CalendarBlocker';
       return Response.redirect(redirectUrl, 302);
     }
 
@@ -57,12 +57,14 @@ export default {
       const qProb = parseFloat(rawProb);
       if (!isNaN(qProb)) blockProbability = clamp(qProb, 0.00, 1.00);
     }
-    const calendarName = env.NAME || "Blocker.day";
+    const calendarName = env.NAME || "CalendarBlocker";
+    const uidHost = url.hostname || "blocker.andrewe.dev";
 
     const calendar = generateICS({
       seedSalt: seed,
       blockProbability,
       calendarName,
+      uidHost,
       timezone: env.TIMEZONE || "America/Toronto",
       blockHours,
       totalDays,
@@ -78,7 +80,7 @@ export default {
   }
 };
 
-function generateICS({ seedSalt, blockProbability, calendarName, timezone, blockHours, totalDays }) {
+function generateICS({ seedSalt, blockProbability, calendarName, uidHost, timezone, blockHours, totalDays }) {
   // Get current date in local time with time set to midnight
   const now = new Date();
   const today = now.toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -86,7 +88,7 @@ function generateICS({ seedSalt, blockProbability, calendarName, timezone, block
   // Create a base domain for UIDs from the seed
   // This ensures UIDs are stable but unique per calendar
   const seedHash = hashString(seedSalt).toString(16);
-  const uidDomain = `${seedHash}@blocker.day`;
+  const uidDomain = `${seedHash}@${uidHost || "blocker.andrewe.dev"}`;
   
   const events = [];
 
@@ -138,7 +140,7 @@ END:VEVENT`);
 
   return `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Cloudflare Worker//Blocker.day Calendar//EN
+PRODID:-//Cloudflare Worker//CalendarBlocker//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 X-WR-CALNAME:${calendarName}
