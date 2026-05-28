@@ -48,14 +48,29 @@ export default {
       const qHours = parseFloat(rawHours);
       if (!isNaN(qHours)) blockHours = validateBlockHours(qHours);
     }
-    // Probability of blocking a time slot; allow full range 0.00–1.00; alias 'p'
-    let blockProbability = clamp(parseFloat(env.PROBABILITY || "0.50"), 0.00, 1.00);
-    if (url.searchParams.has("probability") || url.searchParams.has("p")) {
-      const rawProb = url.searchParams.has("probability")
-        ? url.searchParams.get("probability")
-        : url.searchParams.get("p");
+    // Probability of blocking time slots; allow full range 0.00-1.00.
+    let blockProbability = clamp(parseFloat(env.SHARE || env.PROBABILITY || "0.50"), 0.00, 1.00);
+    const hasFlatProbability = url.searchParams.has("share") || url.searchParams.has("probability") || url.searchParams.has("p");
+    if (hasFlatProbability) {
+      const rawProb = getFirstSearchParam(url.searchParams, ["share", "probability", "p"]);
       const qProb = parseFloat(rawProb);
       if (!isNaN(qProb)) blockProbability = clamp(qProb, 0.00, 1.00);
+    }
+    // Optional declining probability: day 0 starts at `start`, final day ends at `end`.
+    // `share`/`probability`/`p` takes precedence when both modes are present.
+    let probabilityRange = null;
+    if (!hasFlatProbability && url.searchParams.has("start") && url.searchParams.has("end")) {
+      const qStart = parseFloat(url.searchParams.get("start"));
+      const qEnd = parseFloat(url.searchParams.get("end"));
+      if (!isNaN(qStart) && !isNaN(qEnd)) {
+        probabilityRange = {
+          start: clamp(qStart, 0.00, 1.00),
+          end: clamp(qEnd, 0.00, 1.00),
+        };
+        if (probabilityRange.start < probabilityRange.end) {
+          return new Response("start must be greater than or equal to end", { status: 400 });
+        }
+      }
     }
     const calendarName = env.NAME || "CalendarBlocker";
     const uidHost = url.hostname || "blocker.andrewe.ca";
@@ -63,6 +78,7 @@ export default {
     const calendar = generateICS({
       seedSalt: seed,
       blockProbability,
+      probabilityRange,
       calendarName,
       uidHost,
       timezone: env.TIMEZONE || "America/Toronto",
@@ -80,16 +96,16 @@ export default {
   }
 };
 
-function generateICS({ seedSalt, blockProbability, calendarName, uidHost, timezone, blockHours, totalDays }) {
+function generateICS({ seedSalt, blockProbability, probabilityRange, calendarName, uidHost, timezone, blockHours, totalDays }) {
   // Get current date in local time with time set to midnight
   const now = new Date();
   const today = now.toISOString().split('T')[0]; // YYYY-MM-DD format
-  
+
   // Create a base domain for UIDs from the seed
   // This ensures UIDs are stable but unique per calendar
   const seedHash = hashString(seedSalt).toString(16);
   const uidDomain = `${seedHash}@${uidHost || "blocker.andrewe.ca"}`;
-  
+
   const events = [];
 
   // Use date strings with timezone properly specified for ICS file
@@ -99,15 +115,14 @@ function generateICS({ seedSalt, blockProbability, calendarName, uidHost, timezo
     const currentDate = new Date(now);
     currentDate.setDate(currentDate.getDate() + dayOffset);
     const dateStr = currentDate.toISOString().split("T")[0]; // YYYY-MM-DD
-    
-    // Generate deterministic seed for this date and salt
-    const daySeed = hashString(seedSalt + dateStr);
-    const rng = mulberry32(daySeed);
 
     // Generate possible time blocks for this day
     const blocksPerDay = 24 / blockHours;
+    const targetShare = getTargetShare(dayOffset, totalDays, blockProbability, probabilityRange);
+    const blockedSlots = selectBlockedSlots(seedSalt, dateStr, blockHours, blocksPerDay, targetShare);
+
     for (let i = 0; i < blocksPerDay; i++) {
-      if (rng() < blockProbability) {
+      if (blockedSlots.has(i)) {
         // Calculate start and end times based on blockHours (supports fractional hours)
         const icsDate = dateStr.replace(/-/g, ''); // yyyymmdd
         const minutesStart = Math.round(i * blockHours * 60);
@@ -158,13 +173,43 @@ function hashString(str) {
   return hash >>> 0;
 }
 
-function mulberry32(seed) {
-  return function () {
-    let t = seed += 0x6D2B79F5;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+function getFirstSearchParam(searchParams, names) {
+  for (const name of names) {
+    if (searchParams.has(name)) return searchParams.get(name);
+  }
+  return null;
+}
+
+function getTargetShare(dayOffset, totalDays, blockProbability, probabilityRange) {
+  if (!probabilityRange) return blockProbability;
+
+  const progress = totalDays === 0 ? 0 : dayOffset / totalDays;
+  return probabilityRange.start + (probabilityRange.end - probabilityRange.start) * progress;
+}
+
+function selectBlockedSlots(seedSalt, dateStr, blockHours, blocksPerDay, targetShare) {
+  const blockedCount = Math.round(blocksPerDay * targetShare);
+  if (blockedCount <= 0) return new Set();
+  if (blockedCount >= blocksPerDay) {
+    return new Set(Array.from({ length: blocksPerDay }, (_, index) => index));
+  }
+
+  return new Set(
+    Array.from({ length: blocksPerDay }, (_, index) => {
+      const minutesStart = Math.round(index * blockHours * 60);
+      return {
+        index,
+        score: slotScore(seedSalt, dateStr, minutesStart),
+      };
+    })
+      .sort((a, b) => a.score - b.score)
+      .slice(0, blockedCount)
+      .map((slot) => slot.index)
+  );
+}
+
+function slotScore(seedSalt, dateStr, minutesStart) {
+  return hashString(`${seedSalt}-${dateStr}-${minutesStart}-block`) / 4294967296;
 }
 
 function formatDateLocal(date) {
